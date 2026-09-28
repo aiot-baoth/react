@@ -4,9 +4,13 @@ import { Button, Input } from '@/components/atoms'
 import { cn } from '@/utils'
 
 export type SearchBarProps = {
+  /** Placeholder của input */
   placeholder?: string
+  /** Giá trị khởi tạo */
   defaultValue?: string
+  /** Gọi khi submit (Enter hoặc bấm nút), keyword đã trim */
   onSearch?: (keyword: string) => void
+  /** Class Tailwind bổ sung cho form */
   className?: string
 }
 

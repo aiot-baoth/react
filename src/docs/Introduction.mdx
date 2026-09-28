@@ -1,0 +1,41 @@
+import { Meta } from '@storybook/addon-docs/blocks'
+
+<Meta title="Giới thiệu/Tổng quan" />
+
+# Base Frontend — UI Kit
+
+Thư viện component dựng sẵn, tổ chức theo **Atomic Design**, kết hợp **MUI**, **Ant Design** và **Tailwind CSS v4**.
+
+## Các tầng
+
+| Tầng          | Vai trò                                             | Ví dụ                               |
+| ------------- | --------------------------------------------------- | ----------------------------------- |
+| **Atoms**     | Thành phần nhỏ nhất, không phụ thuộc component khác | `Button`, `Input`, `Loader`, `Logo` |
+| **Molecules** | Ghép vài atom thành 1 chức năng nhỏ                 | `FormField`, `SearchBar`            |
+| **Organisms** | Khối UI hoàn chỉnh, có thể chứa logic               | `Header`                            |
+| **Templates** | Khung layout của trang, chưa có dữ liệu thật        | `MainLayout`                        |
+| **Pages**     | Template + dữ liệu thật, gắn với route              | `HomePage`, `NotFoundPage`          |
+
+> Quy tắc: tầng trên chỉ import từ tầng dưới (atoms ← molecules ← organisms ← templates ← pages).
+
+## Cách dùng
+
+```tsx
+import { Button, Input } from '@/components/atoms'
+import { FormField, SearchBar } from '@/components/molecules'
+import { Header } from '@/components/organisms'
+```
+
+## Style
+
+- Ưu tiên dùng **props** của component (`variant`, `color`, `size`...).
+- Chỉnh layout/spacing bằng **Tailwind** qua `className`: `<Button className="w-full mt-4" />`.
+- Tailwind luôn override được MUI/antd nhờ CSS `@layer`. Cần ép mạnh hơn thì thêm `!`: `bg-success!`.
+- Màu dùng token: `text-primary`, `bg-surface`, `border-border`... (xem **Foundations/Design Tokens**).
+
+## Thêm component mới
+
+1. Tạo folder `src/components/<tầng>/<Name>/` gồm `Name.tsx`, `index.ts`, `Name.stories.tsx`.
+2. Export trong `src/components/<tầng>/index.ts`.
+3. Viết JSDoc cho props — Storybook tự hiển thị trong bảng **Controls/Docs**.
+4. Chạy `npm run storybook` để kiểm tra.

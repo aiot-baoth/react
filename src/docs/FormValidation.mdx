@@ -1,0 +1,68 @@
+import { Meta } from '@storybook/addon-docs/blocks'
+
+<Meta title="Giới thiệu/Form validation" />
+
+# Form validation — React Hook Form + Zod
+
+| Thành phần            | Vị trí                         | Vai trò                                                    |
+| --------------------- | ------------------------------ | ---------------------------------------------------------- |
+| Cấu hình Zod          | `src/schemas/zod.ts`           | Bật thông báo lỗi mặc định tiếng Việt (`z.config(vi())`)   |
+| Rule dùng chung       | `src/schemas/common.schema.ts` | `requiredString`, `emailRule`, `passwordRule`, `phoneRule` |
+| Schema theo nghiệp vụ | `src/schemas/<name>.schema.ts` | `loginSchema`, `registerSchema` + type `z.infer`           |
+| Hook                  | `src/hooks/useZodForm.ts`      | `useForm` + `zodResolver`, type tự suy ra từ schema        |
+| Field                 | `FormInput` (molecule)         | `FormField` nối sẵn với RHF, tự hiện lỗi                   |
+
+> Luôn import `z` từ `@/schemas` (không import thẳng từ `'zod'`) để chắc chắn locale tiếng Việt đã được bật.
+
+## 1. Khai báo schema
+
+```ts
+// src/schemas/profile.schema.ts
+import { emailRule, phoneRule, requiredString } from './common.schema'
+import { z } from './zod'
+
+export const profileSchema = z.object({
+  name: requiredString('họ tên').max(50),
+  email: emailRule,
+  phone: phoneRule.optional(),
+})
+
+export type ProfileFormValues = z.infer<typeof profileSchema>
+```
+
+Export trong `src/schemas/index.ts`.
+
+## 2. Dùng trong component
+
+```tsx
+import { Button } from '@/components/atoms'
+import { FormInput } from '@/components/molecules'
+import { useZodForm } from '@/hooks'
+import { profileSchema } from '@/schemas'
+
+export function ProfileForm({ onSubmit }: { onSubmit: (v: ProfileFormValues) => Promise<void> }) {
+  const { control, handleSubmit, formState } = useZodForm(profileSchema, {
+    defaultValues: { name: '', email: '', phone: '' },
+  })
+
+  return (
+    <form noValidate onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
+      <FormInput control={control} name="name" label="Họ tên" required />
+      <FormInput control={control} name="email" label="Email" required />
+      <FormInput control={control} name="phone" label="Số điện thoại" />
+      <Button type="submit" loading={formState.isSubmitting}>
+        Lưu
+      </Button>
+    </form>
+  )
+}
+```
+
+- `name` được kiểm tra type theo schema: gõ sai tên field sẽ báo lỗi TypeScript.
+- Mặc định validate khi rời ô (`mode: 'onTouched'`), truyền `mode` khác qua options nếu cần.
+- Lỗi từ server: `setError('root', { message })` và hiển thị `errors.root` (xem `LoginForm`).
+- Kết hợp TanStack Query: `onSubmit={(values) => mutation.mutateAsync(values)}`.
+
+## Thêm field kiểu khác (Select, Checkbox, DatePicker...)
+
+Làm giống `FormInput`: tạo molecule mới dùng `useController`, truyền `field.value` / `field.onChange` vào component antd/MUI và hiển thị `fieldState.error?.message`.

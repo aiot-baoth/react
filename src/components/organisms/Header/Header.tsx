@@ -7,7 +7,9 @@ import { cn } from '@/utils'
 export type HeaderNavItem = { label: string; to: string }
 
 export type HeaderProps = {
+  /** Danh sách link điều hướng */
   navItems?: HeaderNavItem[]
+  /** Gọi khi submit ô tìm kiếm */
   onSearch?: (keyword: string) => void
 }
 

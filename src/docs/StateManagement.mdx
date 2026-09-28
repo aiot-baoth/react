@@ -1,0 +1,64 @@
+import { Meta } from '@storybook/addon-docs/blocks'
+
+<Meta title="Giới thiệu/Quản lý state" />
+
+# Quản lý state
+
+| Loại state                                                   | Công cụ                        | Ví dụ                                 |
+| ------------------------------------------------------------ | ------------------------------ | ------------------------------------- |
+| **Server state**: dữ liệu từ API, cần cache/refetch          | **TanStack Query** + **axios** | danh sách post, chi tiết user         |
+| **Client state**: chỉ tồn tại ở client, dùng chung nhiều nơi | **Redux Toolkit**              | token, user đăng nhập, sidebar, theme |
+| **Local state**: chỉ 1 component dùng                        | `useState` / `useReducer`      | giá trị input, modal mở/đóng          |
+
+> Không đưa dữ liệu API vào Redux. Dữ liệu API để TanStack Query quản lý (cache, loading, error, refetch).
+
+## Gọi API — axios
+
+`src/services/api/axiosClient.ts`
+
+- `baseURL` = `VITE_API_URL`, timeout 15s
+- Request interceptor: tự gắn `Authorization: Bearer <token>` (lấy từ Redux)
+- Response interceptor: chuẩn hoá lỗi thành `ApiError { message, status, data }`, gặp **401** thì tự `logout()`
+- Helper `api.get/post/put/patch/delete` trả thẳng `data`
+
+Mỗi resource một file `src/services/api/<name>Api.ts`:
+
+```ts
+export const postApi = {
+  getList: (params?: { _limit?: number }) => api.get<Post[]>('/posts', { params }),
+  create: (payload: CreatePostPayload) => api.post<Post>('/posts', payload),
+}
+```
+
+## Server state — TanStack Query
+
+Mỗi resource một file `src/hooks/queries/use<Name>.ts` gồm **key factory**, **queryOptions** và **hooks**:
+
+```tsx
+import { useCreatePost, usePosts } from '@/hooks'
+
+const { data, isPending, error } = usePosts({ _limit: 5 }) // error có type ApiError
+const createPost = useCreatePost() // onSuccess tự invalidate danh sách
+createPost.mutate({ userId: 1, title: '...', body: '...' })
+```
+
+Mặc định (`src/services/queryClient.ts`): `staleTime` 60s, tắt refetch khi focus lại cửa sổ, không retry lỗi 4xx.
+DevTools hiện ở góc dưới trái khi chạy dev (tự bị loại khỏi bản build production).
+
+## Client state — Redux Toolkit
+
+`src/store/` gồm `slices/` (`authSlice`, `uiSlice`), `listeners.ts` (side effect như lưu localStorage), `hooks.ts`.
+
+```tsx
+import { selectIsAuthenticated, setCredentials, useAppDispatch, useAppSelector } from '@/store'
+
+const dispatch = useAppDispatch()
+const isAuthenticated = useAppSelector(selectIsAuthenticated)
+dispatch(setCredentials({ token }))
+```
+
+Thêm slice mới:
+
+1. Tạo `src/store/slices/<name>Slice.ts` bằng `createSlice` (khai báo `selectors` ngay trong slice).
+2. Thêm vào `combineSlices(...)` trong `src/store/store.ts`.
+3. Export trong `src/store/slices/index.ts`.

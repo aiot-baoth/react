@@ -2,8 +2,11 @@ import { useId } from 'react'
 import { Input, type InputProps } from '@/components/atoms'
 
 export type FormFieldProps = InputProps & {
+  /** Nhãn hiển thị phía trên input */
   label: string
+  /** Thông báo lỗi; có giá trị thì input chuyển sang status `error` */
   error?: string
+  /** Hiện dấu `*` bắt buộc */
   required?: boolean
 }
 

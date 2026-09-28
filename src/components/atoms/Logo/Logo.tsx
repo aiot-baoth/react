@@ -1,7 +1,9 @@
 import { cn } from '@/utils'
 
 export type LogoProps = {
+  /** Tên hiển thị; ký tự đầu dùng làm icon */
   text?: string
+  /** Class Tailwind bổ sung */
   className?: string
 }
 

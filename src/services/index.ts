@@ -1,1 +1,2 @@
-export { httpClient } from './httpClient'
+export * from './api'
+export { queryClient } from './queryClient'

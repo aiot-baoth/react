@@ -1,0 +1,64 @@
+import { ColorPalette, ColorItem, Meta, Typeset } from '@storybook/addon-docs/blocks'
+import { tokens } from '../theme/tokens'
+
+<Meta title="Foundations/Design Tokens" />
+
+# Design Tokens
+
+Nguồn: `src/theme/tokens.ts` (MUI + antd) và `@theme` trong `src/styles/global.css` (Tailwind).
+Khi đổi giá trị, cập nhật **cả hai** file.
+
+## Màu
+
+Tailwind class: `bg-<tên>`, `text-<tên>`, `border-<tên>` (vd `bg-primary`, `text-text-secondary`).
+
+<ColorPalette>
+  <ColorItem
+    title="primary"
+    subtitle="--color-primary"
+    colors={{ primary: tokens.color.primary }}
+  />
+  <ColorItem
+    title="secondary"
+    subtitle="--color-secondary"
+    colors={{ secondary: tokens.color.secondary }}
+  />
+  <ColorItem
+    title="status"
+    subtitle="success / warning / error / info"
+    colors={{
+      success: tokens.color.success,
+      warning: tokens.color.warning,
+      error: tokens.color.error,
+      info: tokens.color.info,
+    }}
+  />
+  <ColorItem
+    title="text"
+    subtitle="text / text-secondary"
+    colors={{ text: tokens.color.text, 'text-secondary': tokens.color.textSecondary }}
+  />
+  <ColorItem
+    title="surface"
+    subtitle="background / surface / border"
+    colors={{
+      background: tokens.color.background,
+      surface: tokens.color.surface,
+      border: tokens.color.border,
+    }}
+  />
+</ColorPalette>
+
+## Typography
+
+Font: `{tokens.font.family}` — size cơ sở `{tokens.font.size}px`.
+
+<Typeset
+  fontFamily={tokens.font.family}
+  fontSizes={[12, 14, 16, 20, 24, 32]}
+  sampleText="Chữ mẫu tiếng Việt"
+/>
+
+## Bo góc
+
+`borderRadius = {tokens.radius}px` — Tailwind: `rounded-app`.
