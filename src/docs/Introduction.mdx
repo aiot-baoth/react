@@ -5,37 +5,47 @@ import { Meta } from '@storybook/addon-docs/blocks'
 # Base Frontend — UI Kit
 
 Thư viện component dựng sẵn, tổ chức theo **Atomic Design**, kết hợp **MUI**, **Ant Design** và **Tailwind CSS v4**.
+Dùng toolbar phía trên để xem mọi component ở **Dark mode** và **English**.
 
 ## Các tầng
 
-| Tầng          | Vai trò                                             | Ví dụ                               |
-| ------------- | --------------------------------------------------- | ----------------------------------- |
-| **Atoms**     | Thành phần nhỏ nhất, không phụ thuộc component khác | `Button`, `Input`, `Loader`, `Logo` |
-| **Molecules** | Ghép vài atom thành 1 chức năng nhỏ                 | `FormField`, `SearchBar`            |
-| **Organisms** | Khối UI hoàn chỉnh, có thể chứa logic               | `Header`                            |
-| **Templates** | Khung layout của trang, chưa có dữ liệu thật        | `MainLayout`                        |
-| **Pages**     | Template + dữ liệu thật, gắn với route              | `HomePage`, `NotFoundPage`          |
+| Tầng          | Vai trò                                | Component                                                                                                                                                                                                                                                                   |
+| ------------- | -------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Atoms**     | Thành phần nhỏ nhất                    | Animate, AnimatedNumber, Stagger/StaggerItem, Avatar, Badge, Button, Checkbox, DatePicker/RangePicker, Divider, Icon, Input, Link, Loader, Logo, NumberInput, RadioGroup, Select, Skeleton, StatusTag, Switch, Textarea, Tooltip, Typography (Heading/Text)                 |
+| **Molecules** | Ghép vài atom thành 1 chức năng nhỏ    | Breadcrumb, ConfirmDialog (+ `useConfirm`), CopyButton, EmptyState, ErrorState, FieldWrapper, FileUpload, Form\* (Input, Select, Checkbox, Switch, RadioGroup, DatePicker, Textarea, NumberInput), LanguageSwitcher, Pagination, SearchBar, StatCard, ThemeToggle, UserMenu |
+| **Organisms** | Khối UI hoàn chỉnh                     | DataTable, ErrorBoundary, FilterBar, Footer, FormDrawer, FormModal, Header, LoginForm, NotificationCenter, PageHeader, PostForm, RegisterForm, Sidebar, Topbar                                                                                                              |
+| **Templates** | Khung layout                           | AuthLayout, DashboardLayout, DetailPageTemplate, ListPageTemplate, MainLayout                                                                                                                                                                                               |
+| **Pages**     | Template + dữ liệu thật, gắn với route | Dashboard, PostList, PostDetail, Login, Register, Components, 403, 404, 500                                                                                                                                                                                                 |
 
 > Quy tắc: tầng trên chỉ import từ tầng dưới (atoms ← molecules ← organisms ← templates ← pages).
 
 ## Cách dùng
 
 ```tsx
-import { Button, Input } from '@/components/atoms'
-import { FormField, SearchBar } from '@/components/molecules'
-import { Header } from '@/components/organisms'
+import { Button, Select, StatusTag } from '@/components/atoms'
+import { FormInput, useConfirmDelete } from '@/components/molecules'
+import { DataTable, FilterBar } from '@/components/organisms'
+import { ListPageTemplate } from '@/components/templates'
 ```
+
+## Làm màn CRUD mới (vd `users`)
+
+1. API: `src/services/api/userApi.ts` (theo mẫu `postApi.ts`)
+2. Query hooks: `src/hooks/queries/useUsers.ts` (theo mẫu `usePosts.ts`)
+3. Schema: `src/schemas/user.schema.ts`, form: `UserForm` (theo mẫu `PostForm`)
+4. Page: `ListPageTemplate` + `FilterBar` + `DataTable` + `FormModal` (theo mẫu `PostListPage`)
+5. Route + menu: `src/app/router/index.tsx`, `src/app/router/menu.tsx`, text: `src/i18n/locales/*.ts`
 
 ## Style
 
-- Ưu tiên dùng **props** của component (`variant`, `color`, `size`...).
-- Chỉnh layout/spacing bằng **Tailwind** qua `className`: `<Button className="w-full mt-4" />`.
-- Tailwind luôn override được MUI/antd nhờ CSS `@layer`. Cần ép mạnh hơn thì thêm `!`: `bg-success!`.
-- Màu dùng token: `text-primary`, `bg-surface`, `border-border`... (xem **Foundations/Design Tokens**).
+- Ưu tiên **props** của component (`variant`, `color`, `size`...).
+- Layout/spacing bằng **Tailwind** qua `className`. Tailwind luôn override được MUI/antd nhờ CSS `@layer`; cần ép thì thêm `!` (`bg-success!`).
+- Màu dùng token (`text-text`, `bg-surface`, `border-border`...) để tự đổi theo dark mode.
+- Text hiển thị dùng `t('key')` (i18n), không viết cứng.
 
 ## Thêm component mới
 
-1. Tạo folder `src/components/<tầng>/<Name>/` gồm `Name.tsx`, `index.ts`, `Name.stories.tsx`.
+1. Tạo `src/components/<tầng>/<Name>/` gồm `Name.tsx`, `index.ts`, `Name.stories.tsx`.
 2. Export trong `src/components/<tầng>/index.ts`.
 3. Viết JSDoc cho props — Storybook tự hiển thị trong bảng **Controls/Docs**.
-4. Chạy `npm run storybook` để kiểm tra.
+4. `npm run storybook` để kiểm tra (cả Light/Dark, Tiếng Việt/English).

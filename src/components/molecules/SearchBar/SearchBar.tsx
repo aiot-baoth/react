@@ -1,10 +1,11 @@
 import SearchIcon from '@mui/icons-material/Search'
 import { useState, type FormEvent } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Button, Input } from '@/components/atoms'
 import { cn } from '@/utils'
 
 export type SearchBarProps = {
-  /** Placeholder của input */
+  /** Placeholder của input; mặc định "Tìm kiếm..." (theo ngôn ngữ) */
   placeholder?: string
   /** Giá trị khởi tạo */
   defaultValue?: string
@@ -15,12 +16,8 @@ export type SearchBarProps = {
 }
 
 /** Molecule: Input (antd) + Button (MUI). */
-export function SearchBar({
-  placeholder = 'Tìm kiếm...',
-  defaultValue = '',
-  onSearch,
-  className,
-}: SearchBarProps) {
+export function SearchBar({ placeholder, defaultValue = '', onSearch, className }: SearchBarProps) {
+  const { t } = useTranslation()
   const [keyword, setKeyword] = useState(defaultValue)
 
   const handleSubmit = (e: FormEvent) => {
@@ -33,10 +30,10 @@ export function SearchBar({
       <Input
         value={keyword}
         onChange={(e) => setKeyword(e.target.value)}
-        placeholder={placeholder}
+        placeholder={placeholder ?? t('common.searchPlaceholder')}
       />
       <Button type="submit" size="small" startIcon={<SearchIcon />}>
-        Tìm
+        {t('common.search')}
       </Button>
     </form>
   )

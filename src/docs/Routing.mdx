@@ -1,0 +1,60 @@
+import { Meta } from '@storybook/addon-docs/blocks'
+
+<Meta title="Giới thiệu/Routing" />
+
+# Routing & phân quyền
+
+Router: `src/app/router/index.tsx` (react-router data router, mỗi page lazy load 1 chunk).
+
+| Nhóm          | Guard                                                                   | Layout            | Route                                      |
+| ------------- | ----------------------------------------------------------------------- | ----------------- | ------------------------------------------ |
+| Khách         | `GuestRoute` — đã đăng nhập thì chuyển về trang trước                   | `AuthLayout`      | `/login`, `/register`                      |
+| Cần đăng nhập | `ProtectedRoute` — chưa đăng nhập -> `/login`, xong quay lại đúng trang | `DashboardLayout` | `/`, `/posts`, `/posts/:id`, `/components` |
+| Public        | —                                                                       | `MainLayout`      | `/403`, `/500`, `*` (404)                  |
+
+Lỗi render / lazy load trong route -> `RouteErrorBoundary` (`errorElement`). Lỗi trong nội dung trang -> `ErrorBoundary` do `DashboardLayout` bọc sẵn.
+
+## Phân quyền theo role
+
+```tsx
+{
+  element: <ProtectedRoute roles={['admin']} />, // thiếu role -> trang 403
+  children: [{ path: 'users', lazy: page(() => import('@/pages/UserListPage')) }],
+}
+```
+
+`user.roles` lấy từ Redux (`authSlice`). Demo: đăng nhập bằng email bắt đầu bằng `admin` để có role `admin`.
+
+## Breadcrumb tự động
+
+Khai báo `handle.crumb` trên route — `PageHeader` / `Breadcrumb` tự sinh:
+
+```tsx
+{ path: 'posts', handle: { crumb: 'menu.posts' } satisfies RouteHandle, children: [
+  { index: true, lazy: page(() => import('@/pages/PostListPage')) },
+  { path: ':id', handle: { crumb: (params) => `#${params.id}` } satisfies RouteHandle, ... },
+] }
+```
+
+-> `Tổng quan / Bài viết / #12`
+
+## Menu trái
+
+`src/app/router/menu.tsx` — thêm `{ path, label: t('menu.xxx'), icon }`. Mục đang chọn tự khớp theo URL.
+
+## Lọc / phân trang trên URL
+
+```tsx
+const [params, setParams] = useQueryParams({ page: '1', pageSize: '10', q: '' })
+setParams({ q: 'react', page: 1 }) // -> ?q=react
+```
+
+Reload hoặc chia sẻ link vẫn giữ nguyên bộ lọc. Giá trị bằng mặc định sẽ bị bỏ khỏi URL cho gọn.
+
+## Story cần router
+
+Global decorator dùng `createMemoryRouter`. Trang đọc params:
+
+```tsx
+parameters: { router: { initialEntries: ['/posts/1'], path: '/posts/:id' } }
+```

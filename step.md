@@ -137,3 +137,49 @@ echo 'npx --no -- commitlint --edit "$1"' > .husky/commit-msg
 echo "cap nhat" | npx commitlint                 # ✖ bị chặn
 echo "feat(form): thêm validate" | npx commitlint # ✔
 ```
+
+## 13. Bộ component đầy đủ + dark mode + i18n + routing
+
+```bash
+npm i dayjs i18next react-i18next i18next-browser-languagedetector
+git mv src/pages/HomePage src/pages/ComponentsPage
+```
+
+- Dark mode: `tokens.mode.light/dark`, `createMuiTheme(mode)`, `createAntdTheme(mode)`, CSS `[data-theme='dark']` + `@custom-variant dark`, Redux `uiSlice.themeMode`, `ThemeBridge`, script chống nháy trong `index.html`
+- i18n: `src/i18n` (vi/en, key có type), đồng bộ antd/dayjs/Zod; lỗi validate dùng `vmsg()` (`src/i18n/validation.ts`)
+- Atoms: Typography, Icon, Avatar, Badge, StatusTag, Checkbox, RadioGroup, Switch, Select, DatePicker/RangePicker, Textarea, NumberInput, Tooltip, Divider, Skeleton, Link
+- Molecules: FieldWrapper, Form{Select,Checkbox,Switch,RadioGroup,DatePicker,Textarea,NumberInput}, ConfirmDialog + useConfirm, EmptyState, ErrorState, Breadcrumb, Pagination, UserMenu, StatCard, FileUpload, CopyButton, ThemeToggle, LanguageSwitcher
+- Organisms: DataTable, Sidebar, Topbar, PageHeader, FilterBar, FormModal, FormDrawer, NotificationCenter, Footer, PostForm, ErrorBoundary
+- Templates: DashboardLayout, AuthLayout, ListPageTemplate, DetailPageTemplate
+- Routing: `ProtectedRoute` (roles), `GuestRoute`, `RouteErrorBoundary`, `handle.crumb`, menu `src/app/router/menu.tsx`, `useQueryParams`
+- Pages: Dashboard, PostList (CRUD), PostDetail, Login, Register, Components, 403, 500, 404
+- Storybook: `createMemoryRouter` + `parameters.router`, toolbar Theme/Ngôn ngữ, loader set locale trước render, `docs.source.type: 'code'`
+
+- Tối ưu bundle (JS ban đầu 562kB -> 319kB gzip):
+  - `package.json` `"sideEffects": ["*.css", "./src/i18n/index.ts", "./src/schemas/zod.ts"]` -> tree-shake qua barrel `index.ts`
+  - Bỏ chunk `vendor-antd` (antd tách theo trang), layout route cũng lazy load
+
+```bash
+npm pkg set 'sideEffects[0]=*.css' 'sideEffects[1]=./src/i18n/index.ts' 'sideEffects[2]=./src/schemas/zod.ts'
+npm run typecheck && npm run lint && npm run format:check
+npm run build && npm run build-storybook
+npx vite preview   # chạy thử bản build
+```
+
+## 14. Animation (Motion)
+
+```bash
+npm i motion
+```
+
+- `src/theme/motion.ts`: `motionTokens` (duration/easing/stagger), `motionPresets` (fade, slideUp, slideDown, slideLeft, scale), `staggerContainer`
+- `src/theme/motionFeatures.ts`: `domAnimation` tải bất đồng bộ (chunk ~6kB)
+- `AppProviders`: `<LazyMotion features={...} strict>` + `<MotionConfig reducedMotion="user">`
+- Atoms: `Animate`, `Stagger`/`StaggerItem`, `AnimatedNumber`; `StatCard` tự chạy số khi `value` là number
+- Áp dụng: chuyển trang (Dashboard/Main/AuthLayout), thẻ số liệu dashboard, thông báo, bình luận, EmptyState, ErrorState
+- ESLint `no-restricted-imports`: cấm `motion` (dùng `m`) và `framer-motion`
+- Storybook: toolbar Animation On/Off, `parameters.motion.skip` cho play test (`MotionGlobalConfig.skipAnimations`), docs `src/docs/Animation.mdx`
+
+## 15. CLAUDE.md
+
+- Tạo `CLAUDE.md`: stack, lệnh, cấu trúc, quy ước; rule **không tự ý commit/push**

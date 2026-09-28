@@ -1,3 +1,8 @@
 export * from './queries'
+export { useFieldController } from './useFieldController'
+export type { ControlledFieldProps } from './useFieldController'
+export { useNotifications } from './useNotifications'
+export type { NotificationItem } from './useNotifications'
+export { useQueryParams } from './useQueryParams'
 export { useToggle } from './useToggle'
 export { useZodForm } from './useZodForm'

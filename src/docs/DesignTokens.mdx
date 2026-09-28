@@ -1,16 +1,16 @@
-import { ColorPalette, ColorItem, Meta, Typeset } from '@storybook/addon-docs/blocks'
+import { ColorItem, ColorPalette, Meta, Typeset } from '@storybook/addon-docs/blocks'
 import { tokens } from '../theme/tokens'
 
 <Meta title="Foundations/Design Tokens" />
 
 # Design Tokens
 
-Nguồn: `src/theme/tokens.ts` (MUI + antd) và `@theme` trong `src/styles/global.css` (Tailwind).
+Nguồn: `src/theme/tokens.ts` (MUI + antd) và `src/styles/global.css` (Tailwind: `@theme` cho light, `[data-theme='dark']` cho dark).
 Khi đổi giá trị, cập nhật **cả hai** file.
 
-## Màu
+## Màu thương hiệu / trạng thái
 
-Tailwind class: `bg-<tên>`, `text-<tên>`, `border-<tên>` (vd `bg-primary`, `text-text-secondary`).
+Giống nhau ở cả 2 mode. Tailwind: `bg-primary`, `text-error`, `border-success`...
 
 <ColorPalette>
   <ColorItem
@@ -33,29 +33,32 @@ Tailwind class: `bg-<tên>`, `text-<tên>`, `border-<tên>` (vd `bg-primary`, `t
       info: tokens.color.info,
     }}
   />
+</ColorPalette>
+
+## Màu nền / chữ / viền — đổi theo theme
+
+Tailwind: `text-text`, `text-text-secondary`, `bg-background`, `bg-surface`, `border-border`. Class tự đổi màu khi chuyển dark mode, không cần `dark:`.
+
+<ColorPalette>
   <ColorItem
-    title="text"
-    subtitle="text / text-secondary"
-    colors={{ text: tokens.color.text, 'text-secondary': tokens.color.textSecondary }}
+    title="Light"
+    subtitle="text / text-secondary / background / surface / border"
+    colors={tokens.mode.light}
   />
   <ColorItem
-    title="surface"
-    subtitle="background / surface / border"
-    colors={{
-      background: tokens.color.background,
-      surface: tokens.color.surface,
-      border: tokens.color.border,
-    }}
+    title="Dark"
+    subtitle="text / text-secondary / background / surface / border"
+    colors={tokens.mode.dark}
   />
 </ColorPalette>
 
 ## Typography
 
-Font: `{tokens.font.family}` — size cơ sở `{tokens.font.size}px`.
+Font: `{tokens.font.family}` — size cơ sở `{tokens.font.size}px`. Dùng atom `Heading` / `Text` thay vì tự viết class.
 
 <Typeset
   fontFamily={tokens.font.family}
-  fontSizes={[12, 14, 16, 20, 24, 32]}
+  fontSizes={[12, 14, 16, 20, 24, 30]}
   sampleText="Chữ mẫu tiếng Việt"
 />
 

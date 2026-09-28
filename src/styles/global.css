@@ -6,6 +6,9 @@
 
 @import 'tailwindcss';
 
+/* Dark mode theo attribute <html data-theme="dark"> -> dùng `dark:` trong class */
+@custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
+
 /* Preflight Tailwind v4 bỏ cursor:pointer cho button -> thêm lại */
 @layer base {
   button:not(:disabled),
@@ -14,7 +17,7 @@
   }
 }
 
-/* Đồng bộ với src/theme/tokens.ts */
+/* Đồng bộ với src/theme/tokens.ts (light) */
 @theme {
   --color-primary: #1677ff;
   --color-secondary: #722ed1;
@@ -30,6 +33,18 @@
 
   --font-sans: 'Inter', system-ui, 'Segoe UI', Roboto, sans-serif;
   --radius-app: 8px;
+}
+
+/* Đồng bộ với tokens.mode.dark — utilities (bg-surface, text-text...) tự đổi màu */
+@layer theme {
+  [data-theme='dark'] {
+    --color-text: #f0f0f0;
+    --color-text-secondary: #a6a6a6;
+    --color-background: #0f0f10;
+    --color-surface: #1c1c1e;
+    --color-border: #3a3a3c;
+    color-scheme: dark;
+  }
 }
 
 html,

@@ -1,0 +1,89 @@
+import { Meta } from '@storybook/addon-docs/blocks'
+
+<Meta title="Giới thiệu/Animation" />
+
+# Animation — Motion
+
+Thư viện: [Motion](https://motion.dev) (`motion`, tên cũ Framer Motion), import từ `motion/react`.
+
+## Thiết lập (đã có sẵn)
+
+`AppProviders` bọc toàn app:
+
+```tsx
+<LazyMotion features={() => import('@/theme/motionFeatures')} strict>
+  <MotionConfig reducedMotion="user">...</MotionConfig>
+</LazyMotion>
+```
+
+- **LazyMotion + `m`**: phần animation tải sau (chunk riêng), bundle ban đầu nhỏ. Chế độ `strict` -> **chỉ dùng `m.div`, `m.span`...**, không dùng `motion.div` (ESLint đã chặn).
+- **`reducedMotion="user"`**: người dùng bật _Giảm chuyển động_ trong hệ điều hành thì animation transform/layout bị tắt.
+- Cần drag / layout animation: đổi `domAnimation` -> `domMax` trong `src/theme/motionFeatures.ts`.
+
+## Tokens & presets — `src/theme/motion.ts`
+
+|                         | Giá trị                                                                               |
+| ----------------------- | ------------------------------------------------------------------------------------- |
+| `motionTokens.duration` | `fast` 0.15s · `base` 0.25s · `slow` 0.4s                                             |
+| `motionTokens.easing`   | `standard` · `enter` (xuất hiện) · `exit` (biến mất)                                  |
+| `motionTokens.stagger`  | 0.05s giữa các phần tử                                                                |
+| `motionPresets`         | `fade`, `slideUp`, `slideDown`, `slideLeft`, `scale` (variants `hidden` -> `visible`) |
+
+## Component dựng sẵn
+
+| Component                 | Dùng khi                                                      |
+| ------------------------- | ------------------------------------------------------------- |
+| `Animate`                 | 1 khối xuất hiện (card, trang, modal tự làm)                  |
+| `Stagger` + `StaggerItem` | Danh sách / lưới xuất hiện lần lượt                           |
+| `AnimatedNumber`          | Số chạy (dashboard). `StatCard` tự dùng khi `value` là number |
+
+```tsx
+import { Animate, AnimatedNumber, Stagger, StaggerItem } from '@/components/atoms'
+
+<Animate preset="slideUp" delay={0.1}>...</Animate>
+<Animate preset="fade" inView>...</Animate>        {/* chạy khi cuộn tới */}
+<Animate key={pathname}><Outlet /></Animate>       {/* chạy lại khi đổi trang */}
+
+<Stagger className="grid grid-cols-4 gap-4">
+  {items.map((i) => <StaggerItem key={i.id}>...</StaggerItem>)}
+</Stagger>
+```
+
+## Đang áp dụng ở đâu
+
+- Chuyển trang: `DashboardLayout` (slideUp), `MainLayout` (fade), `AuthLayout` (scale khi login ↔ register)
+- Dashboard: thẻ số liệu xuất hiện lần lượt + số chạy
+- Danh sách thông báo, bình luận: stagger
+- `EmptyState` (fade), `ErrorState` (scale)
+
+Modal, Drawer, Dropdown, Tooltip của antd/MUI đã có animation riêng — không bọc thêm.
+
+## Tự viết animation
+
+```tsx
+import { m } from 'motion/react'
+import { motionPresets, motionTokens } from '@/theme'
+
+;<m.div
+  variants={motionPresets.scale}
+  initial="hidden"
+  animate="visible"
+  whileHover={{ y: -2 }}
+  whileTap={{ scale: 0.98 }}
+  transition={{ duration: motionTokens.duration.fast, ease: motionTokens.easing.standard }}
+/>
+```
+
+Hiệu ứng khi phần tử **biến mất** dùng `AnimatePresence` + `exit`:
+
+```tsx
+import { AnimatePresence, m } from 'motion/react'
+
+;<AnimatePresence>
+  {open && (
+    <m.div key="panel" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} />
+  )}
+</AnimatePresence>
+```
+
+Nguyên tắc: ưu tiên animate `opacity` / `transform` (x, y, scale) — mượt, không gây reflow; dùng token thay vì số tự đặt.

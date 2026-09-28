@@ -15,9 +15,9 @@ const meta = {
   argTypes: {
     size: {
       control: 'inline-radio',
-      options: ['small', 'default', 'large'],
+      options: ['small', 'middle', 'large'],
       description: 'Kích thước',
-      table: { defaultValue: { summary: 'default' } },
+      table: { defaultValue: { summary: 'middle' } },
     },
     description: { control: 'text', description: 'Dòng mô tả dưới spinner' },
     fullScreen: { control: 'boolean' },
@@ -34,7 +34,7 @@ export const Sizes: Story = {
   render: () => (
     <div className="flex">
       <Loader size="small" />
-      <Loader size="default" />
+      <Loader size="middle" />
       <Loader size="large" />
     </div>
   ),

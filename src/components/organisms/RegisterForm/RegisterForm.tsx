@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/atoms'
 import { FormInput } from '@/components/molecules'
 import { useZodForm } from '@/hooks'
@@ -10,6 +11,7 @@ export type RegisterFormProps = {
 
 /** Organism: form đăng ký — ví dụ rule phức tạp (mật khẩu mạnh, xác nhận mật khẩu). */
 export function RegisterForm({ onSubmit }: RegisterFormProps) {
+  const { t } = useTranslation()
   const {
     control,
     handleSubmit,
@@ -20,13 +22,13 @@ export function RegisterForm({ onSubmit }: RegisterFormProps) {
 
   return (
     <form noValidate onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
-      <FormInput control={control} name="name" label="Họ tên" required />
-      <FormInput control={control} name="email" label="Email" required />
+      <FormInput control={control} name="name" label={t('auth.name')} required />
+      <FormInput control={control} name="email" label={t('auth.email')} required />
       <FormInput
         control={control}
         name="password"
         type="password"
-        label="Mật khẩu"
+        label={t('auth.password')}
         required
         // Đổi mật khẩu -> validate lại ô xác nhận
         rules={{ deps: 'confirmPassword' }}
@@ -35,11 +37,11 @@ export function RegisterForm({ onSubmit }: RegisterFormProps) {
         control={control}
         name="confirmPassword"
         type="password"
-        label="Xác nhận mật khẩu"
+        label={t('auth.confirmPassword')}
         required
       />
       <Button type="submit" fullWidth loading={isSubmitting}>
-        Đăng ký
+        {t('auth.register')}
       </Button>
     </form>
   )

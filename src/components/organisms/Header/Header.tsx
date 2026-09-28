@@ -1,6 +1,7 @@
+import type { ReactNode } from 'react'
 import { NavLink } from 'react-router-dom'
 import { Logo } from '@/components/atoms'
-import { SearchBar } from '@/components/molecules'
+import { LanguageSwitcher, SearchBar, ThemeToggle } from '@/components/molecules'
 import { ENV } from '@/constants'
 import { cn } from '@/utils'
 
@@ -9,12 +10,14 @@ export type HeaderNavItem = { label: string; to: string }
 export type HeaderProps = {
   /** Danh sách link điều hướng */
   navItems?: HeaderNavItem[]
-  /** Gọi khi submit ô tìm kiếm */
+  /** Gọi khi submit ô tìm kiếm; không truyền thì ẩn ô tìm kiếm */
   onSearch?: (keyword: string) => void
+  /** Nội dung thêm bên phải, vd nút Đăng nhập */
+  actions?: ReactNode
 }
 
-/** Organism: Logo + Navigation + SearchBar. */
-export function Header({ navItems = [], onSearch }: HeaderProps) {
+/** Organism: header trang public — Logo + Navigation + SearchBar + ngôn ngữ + theme. */
+export function Header({ navItems = [], onSearch, actions }: HeaderProps) {
   return (
     <header className="sticky top-0 z-10 border-b border-border bg-surface">
       <div className="mx-auto flex h-16 max-w-7xl items-center gap-6 px-4">
@@ -36,7 +39,12 @@ export function Header({ navItems = [], onSearch }: HeaderProps) {
             </NavLink>
           ))}
         </nav>
-        <SearchBar className="ml-auto w-80" onSearch={onSearch} />
+        <div className="ml-auto flex items-center gap-2">
+          {onSearch && <SearchBar className="w-80" onSearch={onSearch} />}
+          <LanguageSwitcher />
+          <ThemeToggle />
+          {actions}
+        </div>
       </div>
     </header>
   )

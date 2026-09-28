@@ -1,1 +1,5 @@
+export * from './AuthLayout'
+export * from './DashboardLayout'
+export * from './DetailPageTemplate'
+export * from './ListPageTemplate'
 export * from './MainLayout'

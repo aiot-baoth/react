@@ -21,7 +21,6 @@ export default defineConfig({
         codeSplitting: {
           groups: [
             { name: 'vendor-mui', test: /node_modules[\\/](@mui|@emotion)/ },
-            { name: 'vendor-antd', test: /node_modules[\\/](antd|@ant-design|@rc-component|rc-)/ },
             {
               name: 'vendor-react',
               test: /node_modules[\\/](react|react-dom|react-router|scheduler)[\\/]/,

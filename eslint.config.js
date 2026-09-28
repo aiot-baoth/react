@@ -46,6 +46,21 @@ export default defineConfig([
         { checksVoidReturn: { attributes: false } },
       ],
       'no-console': ['warn', { allow: ['warn', 'error'] }],
+      // Đang dùng <LazyMotion strict>: chỉ dùng `m.*`, `motion.*` sẽ lỗi runtime + kéo toàn bộ thư viện vào bundle
+      'no-restricted-imports': [
+        'error',
+        {
+          paths: [
+            {
+              name: 'motion/react',
+              importNames: ['motion'],
+              message:
+                "Dùng `m` thay cho `motion` (LazyMotion strict): import { m } from 'motion/react'",
+            },
+            { name: 'framer-motion', message: "Dùng 'motion/react' (Motion v11+)" },
+          ],
+        },
+      ],
     },
   },
 

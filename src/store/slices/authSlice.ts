@@ -5,6 +5,9 @@ export type AuthUser = {
   id: number | string
   name: string
   email: string
+  avatar?: string
+  /** Dùng cho ProtectedRoute `roles` */
+  roles?: string[]
 }
 
 export type AuthState = {
@@ -12,9 +15,18 @@ export type AuthState = {
   user: AuthUser | null
 }
 
+function getSavedUser(): AuthUser | null {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEYS.USER)
+    return raw ? (JSON.parse(raw) as AuthUser) : null
+  } catch {
+    return null
+  }
+}
+
 const initialState: AuthState = {
   token: localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN),
-  user: null,
+  user: getSavedUser(),
 }
 
 export const authSlice = createSlice({

@@ -18,13 +18,15 @@ import { Meta } from '@storybook/addon-docs/blocks'
 
 ```ts
 // src/schemas/profile.schema.ts
-import { emailRule, phoneRule, requiredString } from './common.schema'
+import { vmsg } from '@/i18n/validation'
+import { dateRule, emailRule, phoneRule, requiredString } from './common.schema'
 import { z } from './zod'
 
 export const profileSchema = z.object({
-  name: requiredString('họ tên').max(50),
+  name: requiredString('field.name').max(50, { error: vmsg('validation.maxLength', { max: 50 }) }),
   email: emailRule,
   phone: phoneRule.optional(),
+  birthday: dateRule('field.birthday'),
 })
 
 export type ProfileFormValues = z.infer<typeof profileSchema>
@@ -63,6 +65,17 @@ export function ProfileForm({ onSubmit }: { onSubmit: (v: ProfileFormValues) => 
 - Lỗi từ server: `setError('root', { message })` và hiển thị `errors.root` (xem `LoginForm`).
 - Kết hợp TanStack Query: `onSubmit={(values) => mutation.mutateAsync(values)}`.
 
-## Thêm field kiểu khác (Select, Checkbox, DatePicker...)
+## Thông báo lỗi đa ngôn ngữ
 
-Làm giống `FormInput`: tạo molecule mới dùng `useController`, truyền `field.value` / `field.onChange` vào component antd/MUI và hiển thị `fieldState.error?.message`.
+Không viết câu cố định trong schema — dùng `vmsg(key, params)`; tham số là key `field.*` được dịch luôn:
+
+```ts
+z.string().min(8, { error: vmsg('validation.passwordMin', { min: 8 }) })
+requiredString('field.email') // -> "Vui lòng nhập email" / "Please enter email"
+```
+
+Key nằm ở `validation.*` và `field.*` trong `src/i18n/locales/vi.ts`. Lỗi đang hiển thị tự đổi khi đổi ngôn ngữ.
+
+## Thêm loại field khác
+
+Theo mẫu `FormSelect`: dùng `useFieldController(props)` để tách props của RHF, bọc control bằng `FieldWrapper`, truyền `field.value` / `field.onChange` và `fieldState.error?.message`.

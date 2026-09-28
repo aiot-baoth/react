@@ -1,3 +1,5 @@
 export { z } from './zod'
 export * from './common.schema'
 export * from './auth.schema'
+export * from './post.schema'
+export * from './demo.schema'

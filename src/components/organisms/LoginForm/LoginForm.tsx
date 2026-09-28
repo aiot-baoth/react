@@ -1,4 +1,5 @@
 import { Alert } from 'antd'
+import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/atoms'
 import { FormInput } from '@/components/molecules'
 import { useZodForm } from '@/hooks'
@@ -13,6 +14,7 @@ export type LoginFormProps = {
 
 /** Organism: form đăng nhập — React Hook Form + Zod (`loginSchema`). */
 export function LoginForm({ onSubmit, defaultValues }: LoginFormProps) {
+  const { t } = useTranslation()
   const {
     control,
     handleSubmit,
@@ -26,7 +28,7 @@ export function LoginForm({ onSubmit, defaultValues }: LoginFormProps) {
     try {
       await onSubmit(values)
     } catch (err) {
-      setError('root', { message: err instanceof Error ? err.message : 'Đăng nhập thất bại' })
+      setError('root', { message: err instanceof Error ? err.message : t('auth.loginFailed') })
     }
   })
 
@@ -35,14 +37,20 @@ export function LoginForm({ onSubmit, defaultValues }: LoginFormProps) {
       <FormInput
         control={control}
         name="email"
-        label="Email"
+        label={t('auth.email')}
         required
         placeholder="you@example.com"
       />
-      <FormInput control={control} name="password" type="password" label="Mật khẩu" required />
+      <FormInput
+        control={control}
+        name="password"
+        type="password"
+        label={t('auth.password')}
+        required
+      />
       {errors.root && <Alert type="error" showIcon title={errors.root.message} />}
       <Button type="submit" fullWidth loading={isSubmitting}>
-        Đăng nhập
+        {t('auth.login')}
       </Button>
     </form>
   )

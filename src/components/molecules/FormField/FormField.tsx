@@ -1,28 +1,40 @@
 import { useId } from 'react'
 import { Input, type InputProps } from '@/components/atoms'
+import { FieldWrapper, type FieldWrapperProps } from '@/components/molecules/FieldWrapper'
 
-export type FormFieldProps = InputProps & {
-  /** Nhãn hiển thị phía trên input */
-  label: string
-  /** Thông báo lỗi; có giá trị thì input chuyển sang status `error` */
-  error?: string
-  /** Hiện dấu `*` bắt buộc */
-  required?: boolean
-}
+export type FormFieldProps = InputProps &
+  Pick<FieldWrapperProps, 'hint'> & {
+    /** Nhãn hiển thị phía trên input */
+    label: string
+    /** Thông báo lỗi; có giá trị thì input chuyển sang status `error` */
+    error?: string
+    /** Hiện dấu `*` bắt buộc */
+    required?: boolean
+  }
 
 /** Molecule: Label + Input + thông báo lỗi. */
-export function FormField({ label, error, required, id, ...inputProps }: FormFieldProps) {
+export function FormField({
+  label,
+  error,
+  required,
+  hint,
+  id,
+  className,
+  ...inputProps
+}: FormFieldProps) {
   const autoId = useId()
   const inputId = id ?? autoId
 
   return (
-    <div className="flex flex-col gap-1">
-      <label htmlFor={inputId} className="text-sm font-medium text-text">
-        {label}
-        {required && <span className="ml-0.5 text-error">*</span>}
-      </label>
+    <FieldWrapper
+      label={label}
+      htmlFor={inputId}
+      required={required}
+      error={error}
+      hint={hint}
+      className={className}
+    >
       <Input id={inputId} status={error ? 'error' : undefined} {...inputProps} />
-      {error && <span className="text-xs text-error">{error}</span>}
-    </div>
+    </FieldWrapper>
   )
 }

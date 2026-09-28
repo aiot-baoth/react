@@ -1,0 +1,53 @@
+import { Meta } from '@storybook/addon-docs/blocks'
+
+<Meta title="Giới thiệu/Dark mode & i18n" />
+
+# Dark mode & i18n
+
+## Dark mode
+
+- State: Redux `uiSlice.themeMode` (`'light' | 'dark'`), lưu localStorage. Lần đầu theo cài đặt hệ điều hành.
+- `ThemeBridge` (`src/app/providers`) cấp theme cho **MUI** (`palette.mode`), **antd** (`darkAlgorithm`) và set `<html data-theme="dark">` cho **Tailwind**.
+- Script nhỏ trong `index.html` set `data-theme` trước khi React render -> không nháy trắng khi reload.
+
+```tsx
+import {
+  selectThemeMode,
+  setThemeMode,
+  toggleThemeMode,
+  useAppDispatch,
+  useAppSelector,
+} from '@/store'
+
+const mode = useAppSelector(selectThemeMode)
+dispatch(toggleThemeMode())
+```
+
+Tailwind:
+
+- Màu token (`bg-surface`, `text-text`, `border-border`...) **tự đổi** — không cần làm gì.
+- Trường hợp đặc biệt dùng variant `dark:`: `className="bg-black/5 dark:bg-white/10"`.
+
+Đổi màu dark: `tokens.mode.dark` (`src/theme/tokens.ts`) **và** `[data-theme='dark']` (`src/styles/global.css`).
+
+## i18n (react-i18next)
+
+- Cấu hình: `src/i18n/index.ts` — ngôn ngữ `vi` (mặc định), `en`; lưu lựa chọn ở localStorage.
+- Text: `src/i18n/locales/vi.ts` (nguồn) và `en.ts` (TypeScript bắt buộc đủ key như `vi.ts`).
+- Đổi ngôn ngữ tự đồng bộ: antd locale, dayjs (DatePicker, "3 phút trước"), thông báo lỗi mặc định của Zod, `<html lang>`.
+
+```tsx
+import { useTranslation } from 'react-i18next'
+
+const { t, i18n } = useTranslation()
+t('post.editTitle', { id: 1 }) // key được kiểm tra type — gõ sai key báo lỗi
+void i18n.changeLanguage('en')
+```
+
+Thêm text mới: thêm key vào `vi.ts` -> TypeScript báo thiếu ở `en.ts` -> bổ sung.
+
+Thêm ngôn ngữ: tạo `locales/ja.ts` (type `Translation`), thêm vào `resources` + `LANGUAGES`, thêm locale antd/dayjs/Zod trong `ThemeBridge` / `syncLanguage`.
+
+### Thông báo lỗi validate
+
+Message trong Zod schema dùng `vmsg(key, params)` thay vì câu cố định — `FieldWrapper` dịch lúc hiển thị (xem **Form validation**).

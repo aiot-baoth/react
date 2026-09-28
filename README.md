@@ -4,7 +4,9 @@ React 19 + TypeScript + Vite · MUI · Ant Design · Tailwind CSS v4 — tổ ch
 
 State: **TanStack Query** (server state) · **Redux Toolkit** (client state) · **axios** (gọi API).
 
-Form: **React Hook Form** + **Zod** (validate, thông báo lỗi tiếng Việt).
+Form: **React Hook Form** + **Zod** (validate, thông báo lỗi đa ngôn ngữ).
+
+Khác: **Motion** (animation, tôn trọng _Giảm chuyển động_) · **Dark mode** (MUI + antd + Tailwind đồng bộ) · **i18n** vi/en (react-i18next) · Route bảo vệ theo đăng nhập / role.
 
 ## Scripts
 
@@ -20,17 +22,18 @@ Form: **React Hook Form** + **Zod** (validate, thông báo lỗi tiếng Việt)
 
 ```
 src/
-├── app/            # App, providers, router
+├── app/            # App, providers (ThemeBridge), router (guards, menu, error boundary)
 ├── components/
-│   ├── atoms/      # Thành phần nhỏ nhất: Button, Input, Logo, Loader
-│   ├── molecules/  # Ghép atoms: FormField, SearchBar
-│   ├── organisms/  # Khối UI hoàn chỉnh: Header
-│   └── templates/  # Layout trang: MainLayout
+│   ├── atoms/      # 20 atom: Button, Input, Select, DatePicker, Avatar, StatusTag...
+│   ├── molecules/  # 22 molecule: Form*, ConfirmDialog, ErrorState, Breadcrumb, UserMenu...
+│   ├── organisms/  # 14 organism: DataTable, FilterBar, Sidebar, Topbar, FormModal...
+│   └── templates/  # DashboardLayout, AuthLayout, ListPage, DetailPage, MainLayout
 ├── pages/          # Template + dữ liệu thật, lazy load theo route
 ├── theme/          # Design tokens -> MUI theme, antd theme
 ├── styles/         # global.css (Tailwind + @theme + thứ tự layer)
 ├── hooks/          # hooks dùng chung; queries/ = TanStack Query hooks theo resource
 ├── services/       # api/ = axios client + API theo resource; queryClient.ts
+├── i18n/           # i18next: locales vi/en, vmsg() cho lỗi validate
 ├── schemas/        # Zod schema (validate form) + rule dùng chung
 ├── store/          # Redux Toolkit: slices/, listeners.ts, typed hooks
 ├── utils/  constants/  types/
@@ -54,3 +57,9 @@ src/
 - Message commit theo **Conventional Commits** (commitlint): `<type>(<scope>)?: <mô tả>`
   - type: `feat` `fix` `docs` `style` `refactor` `perf` `test` `build` `ci` `chore` `revert`
   - Ví dụ: `feat(auth): thêm form đăng nhập`, `fix(header): lệch logo trên mobile`
+
+## Lưu ý bundle
+
+- `package.json` có `"sideEffects"` để tree-shake qua các barrel `index.ts`. **File nào chạy code khi import** (không chỉ export) thì phải thêm vào danh sách này, nếu không sẽ bị loại khỏi bản build production.
+- Page và layout đều lazy load theo route (`src/app/router/index.tsx`).
+- Animation: chỉ dùng `m.*` từ `motion/react` (đang bật `LazyMotion strict`) hoặc atom `Animate` / `Stagger` / `AnimatedNumber`. Xem Storybook **Giới thiệu / Animation**.
